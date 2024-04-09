@@ -1,0 +1,379 @@
+[
+    {
+        "id": "411958e567b8735c",
+        "type": "subflow",
+        "name": "Respond with message",
+        "info": "",
+        "category": "network",
+        "in": [
+            {
+                "x": 40,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "d8ed1749fc2a0156"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [
+            {
+                "name": "Message",
+                "type": "str",
+                "value": ""
+            },
+            {
+                "name": "ErrorCode",
+                "type": "num",
+                "value": ""
+            },
+            {
+                "name": "HttpCode",
+                "type": "num",
+                "value": ""
+            }
+        ],
+        "meta": {
+            "module": "Respond with message",
+            "author": "development@timotielens.nl",
+            "license": "MIT"
+        },
+        "color": "#F3B567",
+        "inputLabels": [
+            "INPUT"
+        ],
+        "icon": "node-red-contrib-chatbot/chatbot-message.png",
+        "status": {
+            "x": 560,
+            "y": 80,
+            "wires": [
+                {
+                    "id": "c40de5876c12b513",
+                    "port": 0
+                },
+                {
+                    "id": "ca49c1d40c9bc9d1",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "d8ed1749fc2a0156",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Set message",
+        "func": "let message = {\n    statusCode: env.get('ErrorCode'),\n    message: env.get('Message')\n}\n\nif (msg.payload.message){\n    message.message = msg.payload.message\n}\n\nif (msg.payload.statusCode) {\n    message.statusCode = msg.payload.statusCode\n}\n\nmsg.statusCode = env.get('HttpCode')\n\nif (msg.payload.httpCode) {\n    msg.statusCode = msg.payload.httpCode\n}\n\nif (!msg.statusCode) {\n    msg.statusCode = 500\n}\n\nif(msg.payload.stackTrace)\n{\n    message.stackTrace = msg.payload.stackTrace\n}\n\nmessage.httpCode = msg.statusCode\nmsg.payload = message\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 40,
+        "wires": [
+            [
+                "f257a130305644ee",
+                "c40de5876c12b513",
+                "4ad7c57d68dc2470"
+            ]
+        ]
+    },
+    {
+        "id": "f257a130305644ee",
+        "type": "http response",
+        "z": "411958e567b8735c",
+        "name": "Respond",
+        "statusCode": "",
+        "headers": {},
+        "x": 300,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c40de5876c12b513",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Set status",
+        "func": "let httpCode = msg.payload.httpCode\n\nmsg.payload = {\n    fill: \"red\",\n    shape: \"dot\",\n    text: msg.payload.message\n}\n\nif(httpCode < 300){\n    msg.payload.fill = \"green\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4ad7c57d68dc2470",
+        "type": "delay",
+        "z": "411958e567b8735c",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 300,
+        "y": 120,
+        "wires": [
+            [
+                "ca49c1d40c9bc9d1"
+            ]
+        ]
+    },
+    {
+        "id": "ca49c1d40c9bc9d1",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Clear status",
+        "func": "msg.payload = {}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fc18abbfb30d5504",
+        "type": "subflow",
+        "name": "Handle Error",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "a30e44f32551c23c"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [
+            {
+                "name": "ErrorCode",
+                "type": "num",
+                "value": ""
+            },
+            {
+                "name": "Message",
+                "type": "str",
+                "value": ""
+            },
+            {
+                "name": "OutputStackTrace",
+                "type": "bool",
+                "value": "true"
+            }
+        ],
+        "meta": {},
+        "color": "#3FADB5",
+        "inputLabels": [
+            "INPUT"
+        ],
+        "status": {
+            "x": 600,
+            "y": 80,
+            "wires": [
+                {
+                    "id": "66cad9112df014ad",
+                    "port": 0
+                },
+                {
+                    "id": "e49269f265ffe8f3",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "a30e44f32551c23c",
+        "type": "function",
+        "z": "fc18abbfb30d5504",
+        "name": "Get statusCode",
+        "func": "msg.payload.httpCode = 500\nmsg.payload.statusCode = env.get('ErrorCode')\nmsg.payload.message = env.get('Message')\n\nif(env.get('OutputStackTrace')){\nmsg.payload.stackTrace = msg.error.message\n}\n\nif (!msg.payload.message){\n    msg.payload.message = \"An unexpected error occurred\"\n}\n\nif (!msg.payload.statusCode){\n    msg.payload.statusCode = 0\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 40,
+        "wires": [
+            [
+                "66cad9112df014ad",
+                "cfd11fe51f83910f",
+                "dfeb904752946063"
+            ]
+        ]
+    },
+    {
+        "id": "66cad9112df014ad",
+        "type": "function",
+        "z": "fc18abbfb30d5504",
+        "name": "Set status",
+        "func": "msg.payload = {\n    fill:\"red\",\n    shape:\"dot\",\n    text: msg.payload.stackTrace }\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cfd11fe51f83910f",
+        "type": "delay",
+        "z": "fc18abbfb30d5504",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 340,
+        "y": 120,
+        "wires": [
+            [
+                "e49269f265ffe8f3"
+            ]
+        ]
+    },
+    {
+        "id": "e49269f265ffe8f3",
+        "type": "function",
+        "z": "fc18abbfb30d5504",
+        "name": "Clear status",
+        "func": "msg.payload = {}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dfeb904752946063",
+        "type": "subflow:411958e567b8735c",
+        "z": "fc18abbfb30d5504",
+        "name": "",
+        "x": 380,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "0feeaf04af7bcb30",
+        "type": "http in",
+        "z": "f125a0054821e81c",
+        "name": "",
+        "url": "/api/test",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "fe9a1c5d95a1961e"
+            ]
+        ]
+    },
+    {
+        "id": "f3a1ec95972fcab3",
+        "type": "catch",
+        "z": "f125a0054821e81c",
+        "name": "Catch error",
+        "scope": "group",
+        "uncaught": true,
+        "x": 80,
+        "y": 40,
+        "wires": [
+            [
+                "1c1ada5046fadeb6"
+            ]
+        ]
+    },
+    {
+        "id": "fe9a1c5d95a1961e",
+        "type": "function",
+        "z": "f125a0054821e81c",
+        "name": "trigger error",
+        "func": "msg = null\nlet error = msg.payload.notExsting + 69\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1c1ada5046fadeb6",
+        "type": "subflow:fc18abbfb30d5504",
+        "z": "f125a0054821e81c",
+        "name": "",
+        "env": [
+            {
+                "name": "ErrorCode",
+                "value": "69",
+                "type": "num"
+            },
+            {
+                "name": "Message",
+                "value": "Whoopsies",
+                "type": "str"
+            },
+            {
+                "name": "ErrorType",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "x": 230,
+        "y": 40,
+        "wires": []
+    }
+]
