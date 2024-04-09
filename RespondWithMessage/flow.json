@@ -1,0 +1,219 @@
+[
+    {
+        "id": "411958e567b8735c",
+        "type": "subflow",
+        "name": "Respond with message",
+        "info": "",
+        "category": "network",
+        "in": [
+            {
+                "x": 40,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "d8ed1749fc2a0156"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [
+            {
+                "name": "Message",
+                "type": "str",
+                "value": ""
+            },
+            {
+                "name": "ErrorCode",
+                "type": "num",
+                "value": ""
+            },
+            {
+                "name": "HttpCode",
+                "type": "num",
+                "value": ""
+            }
+        ],
+        "meta": {
+            "module": "Respond with message",
+            "author": "development@timotielens.nl",
+            "license": "MIT"
+        },
+        "color": "#F3B567",
+        "inputLabels": [
+            "INPUT"
+        ],
+        "icon": "node-red-contrib-chatbot/chatbot-message.png",
+        "status": {
+            "x": 560,
+            "y": 80,
+            "wires": [
+                {
+                    "id": "c40de5876c12b513",
+                    "port": 0
+                },
+                {
+                    "id": "ca49c1d40c9bc9d1",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "d8ed1749fc2a0156",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Set message",
+        "func": "let message = {\n    statusCode: env.get('ErrorCode'),\n    message: env.get('Message')\n}\n\nif (msg.payload.message){\n    message.message = msg.payload.message\n}\n\nif (msg.payload.statusCode) {\n    message.statusCode = msg.payload.statusCode\n}\n\nmsg.statusCode = env.get('HttpCode')\n\nif (msg.payload.httpCode) {\n    msg.statusCode = msg.payload.httpCode\n}\n\nif (!msg.statusCode) {\n    msg.statusCode = 500\n}\n\nif(msg.payload.stackTrace)\n{\n    message.stackTrace = msg.payload.stackTrace\n}\n\nmessage.httpCode = msg.statusCode\nmsg.payload = message\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 40,
+        "wires": [
+            [
+                "f257a130305644ee",
+                "c40de5876c12b513",
+                "4ad7c57d68dc2470"
+            ]
+        ]
+    },
+    {
+        "id": "f257a130305644ee",
+        "type": "http response",
+        "z": "411958e567b8735c",
+        "name": "Respond",
+        "statusCode": "",
+        "headers": {},
+        "x": 300,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c40de5876c12b513",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Set status",
+        "func": "let httpCode = msg.payload.httpCode\n\nmsg.payload = {\n    fill: \"red\",\n    shape: \"dot\",\n    text: msg.payload.message\n}\n\nif(httpCode < 300){\n    msg.payload.fill = \"green\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4ad7c57d68dc2470",
+        "type": "delay",
+        "z": "411958e567b8735c",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 300,
+        "y": 120,
+        "wires": [
+            [
+                "ca49c1d40c9bc9d1"
+            ]
+        ]
+    },
+    {
+        "id": "ca49c1d40c9bc9d1",
+        "type": "function",
+        "z": "411958e567b8735c",
+        "name": "Clear status",
+        "func": "msg.payload = {}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "63a388e212dbda1d",
+        "type": "subflow:411958e567b8735c",
+        "z": "f125a0054821e81c",
+        "name": "",
+        "env": [
+            {
+                "name": "Message",
+                "value": "TEST",
+                "type": "str"
+            },
+            {
+                "name": "ErrorCode",
+                "value": "1",
+                "type": "num"
+            },
+            {
+                "name": "HttpCode",
+                "value": "318",
+                "type": "num"
+            }
+        ],
+        "x": 490,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "0feeaf04af7bcb30",
+        "type": "http in",
+        "z": "f125a0054821e81c",
+        "name": "",
+        "url": "/api/test",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 40,
+        "wires": [
+            [
+                "c9fe0e26f39b86e0"
+            ]
+        ]
+    },
+    {
+        "id": "c9fe0e26f39b86e0",
+        "type": "function",
+        "z": "f125a0054821e81c",
+        "name": "Override data",
+        "func": "msg.payload.httpCode = 200\nmsg.payload.statusCode = 69\nmsg.payload.message = \"hello world\"\nmsg.payload.stackTrace = \"This is an error stack trace\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 40,
+        "wires": [
+            [
+                "63a388e212dbda1d"
+            ]
+        ]
+    }
+]
